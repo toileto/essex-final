@@ -11,3 +11,7 @@ pytest-cov
 python-dateutil
 wheel
 PyYAML
+
+google-cloud-pubsub
+Faker
+pytz
