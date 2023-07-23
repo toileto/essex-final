@@ -1,0 +1,46 @@
+# Beam properties
+beam_runner: DataflowRunner
+beam_streaming: True
+
+# Dataflow properties
+dataflow_job_name: laminar-streaming-simulation
+dataflow_project_id: essex-thesis-project
+dataflow_region: asia-southeast2
+dataflow_temp_location: gs://essex-thesis-project-laminar-general/streaming/temp/
+dataflow_staging_location: gs://essex-thesis-project-laminar-general/streaming/staging/
+dataflow_subnetwork: https://www.googleapis.com/compute/v1/projects/essex-thesis-project/regions/asia-southeast2/subnetworks/data-processing-subnet-general-1-simulation
+dataflow_no_use_public_ips: True
+dataflow_save_main_session: True
+dataflow_machine_type: n1-standard-1
+dataflow_max_num_workers: 2
+dataflow_autoscaling_algorithm: THROUGHPUT_BASED
+dataflow_labels:
+  project: laminar
+  env: simulation
+dataflow_drain_wait_check_interval_seconds: 10.0
+dataflow_drain_wait_max_seconds: 1800.0
+dataflow_drain_wait_max_threads: 2
+dataflow_running_wait_check_interval_seconds: 5.0
+dataflow_running_wait_max_seconds: 1800.0
+dataflow_running_wait_max_threads: 2
+dataflow_service_account: laminar-general@essex-thesis-project.iam.gserviceaccount.com
+dataflow_enable_streaming_engine: True
+dataflow_experiments: use_runner_v2
+
+# Pub/Sub properties
+pubsub_project_id: essex-thesis-project
+pubsub_subscription: projects/essex-thesis-project/subscriptions/data-processing-source-simulation-sub-bigquery
+
+# BigQuery Raw Datalake properties
+bigquery_raw_project_id: essex-thesis-project
+bigquery_raw_dataset: raw_datalake
+bigquery_raw_dead_letter_dataset: dead_letter
+bigquery_raw_dead_letter_failures_table: source_to_raw_failures
+
+# BigQuery L1 properties
+bigquery_l1_project_id: essex-thesis-project
+bigquery_l1_schema_bucket: essex-thesis-project-schema
+bigquery_l1_schema_folder: L1/datalake
+bigquery_l1_dead_letter_dataset: dead_letter
+bigquery_l1_dead_letter_failures_table: raw_to_l1_failures
+bigquery_l1_dead_letter_unconfigured_table: raw_to_l1_unconfigured
