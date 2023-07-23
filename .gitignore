@@ -1,0 +1,17 @@
+dist/
+build/
+laminar.egg-info/
+**/__pycache__
+
+**/service_account*.json
+
+.DS_Store
+
+.env
+.venv
+env/
+venv/
+
+.terraform*
+terraform.tfstate*
+
