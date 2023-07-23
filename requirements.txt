@@ -1,0 +1,13 @@
+apache-beam[gcp]
+click
+coverage
+google-cloud-secret-manager
+google-cloud-storage
+google-api-python-client
+pytest
+pytest-xdist
+pytest-mock
+pytest-cov
+python-dateutil
+wheel
+PyYAML
