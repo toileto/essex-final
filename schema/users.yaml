@@ -1,0 +1,45 @@
+source:
+  format: mongodb
+  database: visibility
+  table: users
+destination:
+  dataset: L1_datalake
+  table: users
+partition_type: DAY
+partition_by: modified_at
+labels:
+  env: simulation
+fields:
+  - name: user_id
+    type: STRING
+    mode: REQUIRED
+    source: userId
+  - name: username
+    type: STRING
+    mode: NULLABLE
+    source: username
+  - name: email
+    type: STRING
+    mode: NULLABLE
+    source: email
+  - name: password
+    type: STRING
+    mode: NULLABLE
+    source: password
+  - name: login_count
+    type: INTEGER
+    mode: NULLABLE
+    source: loginCount
+  - name: is_active
+    type: BOOLEAN
+    mode: NULLABLE
+    source: isActive
+  - name: created_at
+    type: TIMESTAMP
+    mode: NULLABLE
+    source: createdAt
+  - name: modified_at
+    type: TIMESTAMP
+    mode: NULLABLE
+    source: modifiedAt
+
