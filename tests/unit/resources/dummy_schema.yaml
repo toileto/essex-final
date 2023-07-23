@@ -1,0 +1,92 @@
+source:
+  format: dummy_format
+  database: dummy_db
+  table: dummy_table
+destination:
+  dataset: dummy_dataset
+  table: dummy_table
+partition_type: DAY
+partition_by: column_timestamp
+labels:
+  domain: dummy_domain
+  contact: dummy_user@dsc.technology
+custom_functions:
+  raw_to_l1_hash: ["columnString"]
+fields:
+- name: column_string
+  type: STRING
+  description: null
+  mode: NULLABLE
+  source: columnString
+- name: column_int
+  type: INTEGER
+  description: null
+  mode: NULLABLE
+  source: columnInt
+- name: column_float
+  type: FLOAT
+  description: null
+  mode: NULLABLE
+  source: columnFloat
+- name: column_timestamp
+  type: TIMESTAMP
+  description: null
+  mode: NULLABLE
+  source: columnTimestamp
+- name: column_date
+  type: DATE
+  description: null
+  mode: NULLABLE
+  source: columnDate
+- name: column_bool
+  type: BOOLEAN
+  description: null
+  mode: NULLABLE
+  source: columnBool
+- name: column_array_string
+  type: STRING
+  description: null
+  mode: REPEATED
+  source: columnArrayString
+- name: column_array_int
+  type: INTEGER
+  description: null
+  mode: REPEATED
+  source: columnArrayInteger
+- name: column_array_float
+  type: FLOAT
+  description: null
+  mode: REPEATED
+  source: columnArrayFloat
+- name: column_record
+  type: RECORD
+  description: null
+  mode: NULLABLE
+  source: columnRecord
+  fields:
+    - name: column_string
+      type: STRING
+      description: null
+      mode: NULLABLE
+      source: columnString
+    - name: column_int
+      type: INTEGER
+      description: null
+      mode: NULLABLE
+      source: columnInt
+- name: column_record_repeated
+  type: RECORD
+  description: null
+  mode: REPEATED
+  source: columnRecordRepeated
+  fields:
+    - name: column_string
+      type: STRING
+      description: null
+      mode: NULLABLE
+      source: columnString
+    - name: column_int
+      type: INTEGER
+      description: null
+      mode: NULLABLE
+      source: columnInt

@@ -1,0 +1,33 @@
+beam_runner: "DataflowRunner"
+beam_streaming: False
+dataflow_job_name: "laminar-dummy"
+dataflow_project_id: "dummy-project"
+dataflow_region: "asia-southeast2"
+dataflow_temp_location: "gs://laminar-dummy/temp/"
+dataflow_staging_location: "gs://laminar-dummy/staging/"
+dataflow_subnetwork: "https://www.googleapis.com/compute/v1/projects/dummy-project/regions/asia-southeast2/subnetworks/dummy-subnet"
+dataflow_no_use_public_ips: True
+dataflow_save_main_session: True
+dataflow_machine_type: "n1-standard-2"
+dataflow_max_num_workers: 2
+dataflow_autoscaling_algorithm: "THROUGHPUT_BASED"
+dataflow_labels: 
+  project: "laminar"
+  env: "development"
+dataflow_drain_wait_check_interval_seconds: 10.0
+dataflow_drain_wait_max_seconds: 1800.0
+dataflow_drain_wait_max_threads: 2
+dataflow_running_wait_check_interval_seconds: 5.0
+dataflow_running_wait_max_seconds: 1800.0
+dataflow_running_wait_max_threads: 2
+dataflow_service_account: "laminar-general@dummy-project.iam.gserviceaccount.com"
+dataflow_enable_streaming_engine: True
+dataflow_experiments: "use_runner_v2"
+bigquery_raw_project_id: "dummy-project"
+bigquery_raw_dataset: "raw_datalake"
+bigquery_l1_project_id: "dummy-project"
+bigquery_l1_schema_bucket: "dummy-schema-bucket"
+bigquery_l1_schema_folder: "schema/L1/datalake"
+bigquery_l1_dead_letter_dataset: "dead_letter"
+bigquery_l1_dead_letter_failures_table: "raw_to_l1_failures"
+bigquery_l1_dead_letter_unconfigured_table: "raw_to_l1_unconfigured"
