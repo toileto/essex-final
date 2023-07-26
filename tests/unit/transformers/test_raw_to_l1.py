@@ -419,7 +419,10 @@ def test_RawToL1Transformer_process_configured(dummy_element: dict, dummy_schema
     l1_configs.register_config(dummy_schema_config)
     actual = list(RawToL1Transformer(
         l1_configs=l1_configs,
-        bigquery_project_id="dummy-project"
+        bigquery_project_id="dummy-project",
+        kms_project_id="dummy-project",
+        kms_region="dummy-region",
+        kms_key_ring="dummy-key-ring"
     ).process(
         element_raw=dummy_element
     ))[0]
@@ -432,7 +435,10 @@ def test_RawToL1Transformer_process_unconfigured(dummy_element: dict, dummy_sche
     dummy_element["table"] = "dummy_table_unconfigured"
     actual = list(RawToL1Transformer(
         l1_configs=l1_configs,
-        bigquery_project_id="dummy-project"
+        bigquery_project_id="dummy-project",
+        kms_project_id="dummy-project",
+        kms_region="dummy-region",
+        kms_key_ring="dummy-key-ring"
     ).process(
         element_raw=dummy_element
     ))[0]
@@ -447,7 +453,10 @@ def test_RawToL1Transformer_process_failures(dummy_element: dict, dummy_schema_c
     )
     actual = list(RawToL1Transformer(
         l1_configs=l1_configs,
-        bigquery_project_id="dummy-project"
+        bigquery_project_id="dummy-project",
+        kms_project_id="dummy-project",
+        kms_region="dummy-region",
+        kms_key_ring="dummy-key-ring"
     ).process(
         element_raw=dummy_element
     ))[0]

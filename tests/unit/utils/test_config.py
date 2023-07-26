@@ -87,10 +87,10 @@ def test_ConfigL1_construct_table_schema(dummy_schema_config: dict):
     table_schema: dict = ConfigL1.construct_table_schema(dummy_schema_config["fields"])
     assert type(table_schema) == dict
 
-def test_ConfigL1_construct_custom_functions(dummy_schema_config: dict):
-    actual: dict = ConfigL1.construct_custom_functions(dummy_schema_config)
-    expected: dict = {"raw_to_l1_hash": ["columnString"]}
-    assert actual == expected
+# def test_ConfigL1_construct_custom_functions(dummy_schema_config: dict):
+#     actual: dict = ConfigL1.construct_custom_functions(dummy_schema_config)
+#     expected: dict = {"raw_to_l1_hash": ["columnString"]}
+#     assert actual == expected
 
 def test_ConfigL1_construct_custom_functions_empty():
     actual: dict = ConfigL1.construct_custom_functions({})

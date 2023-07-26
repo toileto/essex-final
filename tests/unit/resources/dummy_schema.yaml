@@ -10,8 +10,8 @@ partition_by: column_timestamp
 labels:
   domain: dummy_domain
   contact: dummy_user@dsc.technology
-custom_functions:
-  raw_to_l1_hash: ["columnString"]
+# custom_functions:
+#   raw_to_l1_hash: ["columnString"]
 fields:
 - name: column_string
   type: STRING

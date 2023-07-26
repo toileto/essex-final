@@ -75,6 +75,10 @@ class PipelineUtility:
         l1_dlq_dataset: str = deployment_config['bigquery_l1_dead_letter_dataset']
         l1_dlq_failures_table: str = deployment_config['bigquery_l1_dead_letter_failures_table']
         l1_dlq_unconfigured_table: str = deployment_config['bigquery_l1_dead_letter_unconfigured_table']
+
+        kms_project_id: str = deployment_config["kms_project_id"]
+        kms_region: str = deployment_config["kms_region"]
+        kms_key_ring: str = deployment_config["kms_key_ring"]
         
         elements_source = (
             pipeline
@@ -114,7 +118,13 @@ class PipelineUtility:
         elements_l1 = (
             elements_raw[SrcToRawTransformer.SUCCESS]
             | "TransformRawToL1" >> beam.ParDo(
-                RawToL1Transformer(l1_configs=l1_configs, bigquery_project_id=l1_project_id)
+                RawToL1Transformer(
+                    l1_configs=l1_configs, 
+                    bigquery_project_id=l1_project_id,
+                    kms_project_id=kms_project_id,
+                    kms_region=kms_region,
+                    kms_key_ring=kms_key_ring
+                )
             ).with_outputs(
                 RawToL1Transformer.ROUTE_CONFIGURED,
                 RawToL1Transformer.ROUTE_UNCONFIGURED,
@@ -178,6 +188,11 @@ class PipelineUtility:
         Returns:
             Batch Dataflow pipeline.
         """
+
+        kms_project_id: str = deployment_config["kms_project_id"]
+        kms_region: str = deployment_config["kms_region"]
+        kms_key_ring: str = deployment_config["kms_key_ring"]
+
         pipeline: beam.Pipeline = beam.Pipeline(options=pipeline_options)
         elements_raw = (
             pipeline
@@ -192,7 +207,10 @@ class PipelineUtility:
             | "TransformRawToL1" >> beam.ParDo(
                 RawToL1Transformer(
                     l1_configs=l1_configs,
-                    bigquery_project_id=deployment_config["bigquery_l1_project_id"]
+                    bigquery_project_id=deployment_config["bigquery_l1_project_id"],
+                    kms_project_id=kms_project_id,
+                    kms_region=kms_region,
+                    kms_key_ring=kms_key_ring
                 )
             ).with_outputs(
                 RawToL1Transformer.ROUTE_CONFIGURED,

@@ -23,7 +23,14 @@ class RawToL1Transformer(beam.DoFn):
     """Path to custom function file."""
     CUSTOM_FUNCTIONS_BASE_PATH: str = "laminar.transformers.custom.raw_to_l1"
 
-    def __init__(self, l1_configs: ConfigL1, bigquery_project_id: str) -> None:
+    def __init__(
+        self, 
+        l1_configs: ConfigL1, 
+        bigquery_project_id: str,
+        kms_project_id: str,
+        kms_region: str,
+        kms_key_ring: str,
+    ) -> None:
         """
         Initialize RawToL1Transformer.
 
@@ -33,6 +40,9 @@ class RawToL1Transformer(beam.DoFn):
         """
         self.l1_configs: ConfigL1 = l1_configs
         self.bigquery_project_id: str = bigquery_project_id
+        self.kms_project_id: str = kms_project_id
+        self.kms_region: str = kms_region
+        self.kms_key_ring: str = kms_key_ring
 
     def process(self, element_raw: dict):
         """
@@ -63,7 +73,14 @@ class RawToL1Transformer(beam.DoFn):
                 )
                 element_transformed: dict = RawToL1Transformer.custom_process_raw_to_l1(
                     element=element_transformed,
-                    custom_functions=table_config["custom_functions"]
+                    custom_functions=table_config["custom_functions"],
+                    extra_params={
+                        "raw_id": raw_id, 
+                        "raw_ts": raw_ts,
+                        "kms_project_id": self.kms_project_id,
+                        "kms_region": self.kms_region,
+                        "kms_key_ring": self.kms_key_ring
+                    }
                 )
                 element_transformed: dict = RawToL1Transformer.cast_raw_to_l1(
                     element=element_transformed,
@@ -344,7 +361,7 @@ class RawToL1Transformer(beam.DoFn):
         ]
 
     @staticmethod
-    def custom_process_raw_to_l1(element: dict, custom_functions: dict) -> dict:
+    def custom_process_raw_to_l1(element: dict, custom_functions: dict, extra_params: dict) -> dict:
         """
         Additional custom processing.
 
@@ -358,7 +375,8 @@ class RawToL1Transformer(beam.DoFn):
         for custom_function_name, columns in custom_functions.items():
             custom_function: Callable = operator.attrgetter(custom_function_name)\
                 (importlib.import_module(RawToL1Transformer.CUSTOM_FUNCTIONS_BASE_PATH))
-            transformed_element: dict = {column: custom_function(data=element[column]) for column in columns}
+            # transformed_element: dict = {column: custom_function(data=element[column], extra_params=extra_params) for column in columns}
+            transformed_element: dict = custom_function(data=element, columns=columns, extra_params=extra_params)
             element.update(transformed_element)
         return element
 

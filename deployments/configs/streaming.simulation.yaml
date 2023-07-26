@@ -44,3 +44,7 @@ bigquery_l1_schema_folder: L1/datalake
 bigquery_l1_dead_letter_dataset: dead_letter
 bigquery_l1_dead_letter_failures_table: raw_to_l1_failures
 bigquery_l1_dead_letter_unconfigured_table: raw_to_l1_unconfigured
+
+kms_project_id: essex-thesis-project
+kms_region: asia-southeast2
+kms_key_ring: users
