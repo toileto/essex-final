@@ -12,81 +12,97 @@ labels:
   contact: dummy_user@dsc.technology
 # custom_functions:
 #   raw_to_l1_hash: ["columnString"]
+# kms_key: column_string
 fields:
 - name: column_string
   type: STRING
   description: null
   mode: NULLABLE
   source: columnString
+  sensitive: False
 - name: column_int
   type: INTEGER
   description: null
   mode: NULLABLE
   source: columnInt
+  sensitive: False
 - name: column_float
   type: FLOAT
   description: null
   mode: NULLABLE
   source: columnFloat
+  sensitive: False
 - name: column_timestamp
   type: TIMESTAMP
   description: null
   mode: NULLABLE
   source: columnTimestamp
+  sensitive: False
 - name: column_date
   type: DATE
   description: null
   mode: NULLABLE
   source: columnDate
+  sensitive: False
 - name: column_bool
   type: BOOLEAN
   description: null
   mode: NULLABLE
   source: columnBool
+  sensitive: False
 - name: column_array_string
   type: STRING
   description: null
   mode: REPEATED
   source: columnArrayString
+  sensitive: False
 - name: column_array_int
   type: INTEGER
   description: null
   mode: REPEATED
   source: columnArrayInteger
+  sensitive: False
 - name: column_array_float
   type: FLOAT
   description: null
   mode: REPEATED
   source: columnArrayFloat
+  sensitive: False
 - name: column_record
   type: RECORD
   description: null
   mode: NULLABLE
   source: columnRecord
+  sensitive: False
   fields:
     - name: column_string
       type: STRING
       description: null
       mode: NULLABLE
       source: columnString
+      sensitive: False
     - name: column_int
       type: INTEGER
       description: null
       mode: NULLABLE
       source: columnInt
+      sensitive: False
 - name: column_record_repeated
   type: RECORD
   description: null
   mode: REPEATED
   source: columnRecordRepeated
+  sensitive: False
   fields:
     - name: column_string
       type: STRING
       description: null
       mode: NULLABLE
       source: columnString
+      sensitive: False
     - name: column_int
       type: INTEGER
       description: null
       mode: NULLABLE
       source: columnInt
+      sensitive: False

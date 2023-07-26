@@ -504,10 +504,14 @@ def test_RawToL1Transformer_parse_raw_to_l1(dummy_element: dict, dummy_schema_co
 
 def test_RawToL1Transformer_cast_raw_to_l1(dummy_element_payload: dict, dummy_schema_config: dict):
     table_config: dict = {
-        "table_schema": ConfigL1.construct_table_schema(l1_config_fields=dummy_schema_config["fields"])
+        "table_schema": ConfigL1.construct_table_schema(l1_config_fields=dummy_schema_config["fields"]),
+        "table_details": {}
     }
     dummy_element_payload["_metadata"] =  "dummy_metadata"
-    transformed_element: dict = RawToL1Transformer.cast_raw_to_l1(
+    transformed_element: dict = RawToL1Transformer(
+        l1_configs=table_config, bigquery_project_id="dummy-project",
+        kms_project_id="dummy-project", kms_region="dummy-region", kms_key_ring="dummy-key-ring"
+    ).cast_raw_to_l1(
         element=dummy_element_payload, table_config=table_config,
         raw_id="123", raw_ts="2023-01-01T07:00:00.000Z"
     )
@@ -546,43 +550,43 @@ def test_RawToL1Transformer_evaluate_string():
 def test_RawToL1Transformer_cast_scalar_integer():
     data = 1
     assert RawToL1Transformer.cast_scalar(
-        data=data, data_type="INTEGER"
+        data=data, data_type="INTEGER", dek="dummy-key", is_sensitive=False
     ) == data
 
 def test_RawToL1Transformer_cast_scalar_float():
     data = 1.0
     assert RawToL1Transformer.cast_scalar(
-        data=data, data_type="FLOAT"
+        data=data, data_type="FLOAT", dek="dummy-key", is_sensitive=False
     ) == data
 
 def test_RawToL1Transformer_cast_scalar_timestamp():
     data = "2023-01-01T07:00:00.000Z"
     assert type(RawToL1Transformer.cast_scalar(
-        data=data, data_type="TIMESTAMP"
+        data=data, data_type="TIMESTAMP", dek="dummy-key", is_sensitive=False
     )) == datetime
 
 def test_RawToL1Transformer_cast_scalar_date():
     data = "2023-01-01T07:00:00.000Z"
     assert RawToL1Transformer.cast_scalar(
-        data=data, data_type="DATE"
+        data=data, data_type="DATE", dek="dummy-key", is_sensitive=False
     ) == data[:10]
 
 def test_RawToL1Transformer_cast_scalar_bool():
     data = True
     assert RawToL1Transformer.cast_scalar(
-        data=data, data_type="BOOL"
+        data=data, data_type="BOOL", dek="dummy-key", is_sensitive=False
     ) == data
 
 def test_RawToL1Transformer_cast_scalar():
     data = "dummy"
     assert RawToL1Transformer.cast_scalar(
-        data=data, data_type="STRING"
+        data=data, data_type="STRING", dek="dummy-key", is_sensitive=False
     ) == data
 
 def test_RawToL1Transformer_cast_array():
     data = ["1", "2", "3"]
     assert RawToL1Transformer.cast_array(
-        data_array=data, data_type="INTEGER"
+        data_array=data, data_type="INTEGER", dek="dummy-key", is_sensitive=False
     ) == [1, 2, 3]
 
 def test_RawToL1WriteErrorDoFn_process():

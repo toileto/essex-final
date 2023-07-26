@@ -17,13 +17,13 @@ ts = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 ts_ms = int(datetime.timestamp(now)*1000)
 payload_data = {
     "userId": id, 
-    "username": "jane.doe", 
-    "email": "jane.doe@xmail.com", 
+    "username": "jane_doe", 
+    "email": "jane.doe@gmail.com", 
     "password": "jane6789", 
-    "loginCount": 5, 
+    "loginCount": 23, 
     "isActive": True, 
-    "createdAt": "2023-07-01T02:57:47.058Z", 
-    "modifiedAt": "2023-07-01T02:57:47.058Z"
+    "createdAt": "2023-07-04T15:00:00.000Z", 
+    "modifiedAt": "2023-07-04T15:00:00.000Z"
 }
 
 data = {

@@ -8,6 +8,11 @@ import operator
 import traceback
 from typing import Callable, Union
 
+from base64 import b64encode
+from Crypto.Cipher import ChaCha20_Poly1305
+from Crypto.Random import get_random_bytes
+from google.cloud.kms import KeyManagementServiceClient
+
 from laminar.utils.config import ConfigL1
 from laminar.utils.bigquery import BigQueryUtility
 from laminar.utils.time import TimeUtility
@@ -71,25 +76,25 @@ class RawToL1Transformer(beam.DoFn):
                     table_config=table_config, 
                     project_id=self.bigquery_project_id
                 )
-                element_transformed: dict = RawToL1Transformer.custom_process_raw_to_l1(
-                    element=element_transformed,
-                    custom_functions=table_config["custom_functions"],
-                    extra_params={
-                        "raw_id": raw_id, 
-                        "raw_ts": raw_ts,
-                        "kms_project_id": self.kms_project_id,
-                        "kms_region": self.kms_region,
-                        "kms_key_ring": self.kms_key_ring
-                    }
-                )
-                wrapped_dek = element_transformed.get("_wrapped_dek")
-                element_transformed: dict = RawToL1Transformer.cast_raw_to_l1(
+                # element_transformed: dict = RawToL1Transformer.custom_process_raw_to_l1(
+                #     element=element_transformed,
+                #     custom_functions=table_config["custom_functions"],
+                #     extra_params={
+                #         "raw_id": raw_id, 
+                #         "raw_ts": raw_ts,
+                #         "kms_project_id": self.kms_project_id,
+                #         "kms_region": self.kms_region,
+                #         "kms_key_ring": self.kms_key_ring
+                #     }
+                # )
+                # wrapped_dek = element_transformed.get("_wrapped_dek")
+                element_transformed: dict = self.cast_raw_to_l1(
                     element=element_transformed,
                     table_config=table_config,
                     raw_id=raw_id,
                     raw_ts=raw_ts
                 )
-                element_transformed["_wrapped_dek"] = wrapped_dek
+                # element_transformed["_wrapped_dek"] = wrapped_dek
                 yield TaggedOutput(
                     RawToL1Transformer.ROUTE_CONFIGURED, 
                     element_transformed
@@ -182,8 +187,7 @@ class RawToL1Transformer(beam.DoFn):
         )
         return element_parsed
     
-    @staticmethod
-    def cast_raw_to_l1(element: dict, table_config: dict, raw_id: str, raw_ts: str) -> dict:
+    def cast_raw_to_l1(self, element: dict, table_config: dict, raw_id: str, raw_ts: str) -> dict:
         """
         Cast data types of parsed L1 element and map the column keys from source to destination.
 
@@ -197,7 +201,22 @@ class RawToL1Transformer(beam.DoFn):
             Casted L1 element.
         """
         table_schema: dict = table_config["table_schema"]
-        element_casted: dict = RawToL1Transformer.cast_element(element=element, table_schema=table_schema)
+
+        dek = get_random_bytes(32)
+
+        element_casted: dict = RawToL1Transformer.cast_element(element=element, table_schema=table_schema, dek=dek)
+
+        kms_key = table_config["table_details"].get("kms_key")
+
+        if kms_key is not None:        
+            kms_client = KeyManagementServiceClient()
+            wrapped_dek = kms_client.encrypt(
+                request={'name': kms_client.crypto_key_path(
+                        self.kms_project_id, self.kms_region, self.kms_key_ring, element_casted[kms_key]
+                    ), 'plaintext': dek
+                }
+            ).ciphertext
+
         casted_raw_ts: datetime = TimeUtility.safe_cast_ts_to_datetime(data=raw_ts)
         element_casted.update({
             "_raw_ts": casted_raw_ts,
@@ -205,10 +224,14 @@ class RawToL1Transformer(beam.DoFn):
             "published_timestamp": casted_raw_ts,
             "_metadata": element["_metadata"]
         })
+        if kms_key is not None:
+            element_casted.update({
+                "_wrapped_dek": b64encode(wrapped_dek).decode()
+            })            
         return element_casted
 
     @staticmethod
-    def cast_element(element: dict, table_schema: dict) -> dict:
+    def cast_element(element: dict, table_schema: dict, dek: bytes) -> dict:
         """
         Cast data type for each column in an element according to the table schema.
 
@@ -248,24 +271,30 @@ class RawToL1Transformer(beam.DoFn):
                 elif data_type != "RECORD" and data_mode == "REPEATED":
                     element_casted[destination_column] = RawToL1Transformer.cast_array(
                         data_array=data,
-                        data_type=data_type
+                        data_type=data_type,
+                        dek=dek,
+                        is_sensitive=column_schema["sensitive"]
                     )
                 elif data_type == "RECORD" and data_mode == "REPEATED":
                     element_casted[destination_column] = [
                         RawToL1Transformer.cast_element(
                             element=child_element,
-                            table_schema=child_table_schema
+                            table_schema=child_table_schema,
+                            dek=dek
                         ) for child_element in data
                     ]
                 elif data_type == "RECORD":
                     element_casted[destination_column] = RawToL1Transformer.cast_element(
                         element=data,
-                        table_schema=child_table_schema
+                        table_schema=child_table_schema,
+                        dek=dek
                     )
                 else:
                     element_casted[destination_column] = RawToL1Transformer.cast_scalar(
                         data=data,
-                        data_type=data_type
+                        data_type=data_type,
+                        dek=dek,
+                        is_sensitive=column_schema["sensitive"]
                     )
         return element_casted
 
@@ -319,7 +348,9 @@ class RawToL1Transformer(beam.DoFn):
     @staticmethod
     def cast_scalar(
         data: Union[int, float, bool, str], 
-        data_type: str
+        data_type: str,
+        dek: bytes,
+        is_sensitive: bool
     ) -> Union[int, float, datetime, bool, str]:
         """
         Cast a scalar data in an element according to the table schema.
@@ -331,22 +362,28 @@ class RawToL1Transformer(beam.DoFn):
         Returns:
             Casted data.
         """
-        if data_type in BigQueryUtility.INTEGER_TYPES:
-            data_casted: int = int(data)
-        elif data_type in BigQueryUtility.FLOAT_TYPES:
-            data_casted: float = float(data)
-        elif data_type in BigQueryUtility.TIMESTAMP_TYPES:
-            data_casted: datetime = TimeUtility.cast_as_datetime(data=data)
-        elif data_type in BigQueryUtility.DATE:
-            data_casted: str = TimeUtility.cast_as_date_string(data=data)
-        elif data_type in BigQueryUtility.BOOLEAN_TYPES:
-            data_casted: bool = bool(data)
+        if is_sensitive:
+            cipher = ChaCha20_Poly1305.new(key=dek)
+            nonce = cipher.nonce
+            ciphertext, tag = cipher.encrypt_and_digest(str(data).encode())
+            data_casted = b64encode(tag+nonce+ciphertext).decode()
         else:
-            data_casted: str = str(data)
+            if data_type in BigQueryUtility.INTEGER_TYPES:
+                data_casted: int = int(data)
+            elif data_type in BigQueryUtility.FLOAT_TYPES:
+                data_casted: float = float(data)
+            elif data_type in BigQueryUtility.TIMESTAMP_TYPES:
+                data_casted: datetime = TimeUtility.cast_as_datetime(data=data)
+            elif data_type in BigQueryUtility.DATE:
+                data_casted: str = TimeUtility.cast_as_date_string(data=data)
+            elif data_type in BigQueryUtility.BOOLEAN_TYPES:
+                data_casted: bool = bool(data)
+            else:
+                data_casted: str = str(data)
         return data_casted
     
     @staticmethod
-    def cast_array(data_array: list, data_type: str) -> list:
+    def cast_array(data_array: list, data_type: str, dek: bytes, is_sensitive: bool) -> list:
         """
         Cast an array data in an element according to the table schema.
 
@@ -358,7 +395,7 @@ class RawToL1Transformer(beam.DoFn):
             Casted non-empty data list.
         """
         return [
-            RawToL1Transformer.cast_scalar(data=data, data_type=data_type) 
+            RawToL1Transformer.cast_scalar(data=data, data_type=data_type, dek=dek, is_sensitive=is_sensitive) 
             for data in data_array if data is not None
         ]
 
