@@ -34,7 +34,7 @@ endif
 
 build_version ?= $(shell bash -e deployments/misc/get_release_version.sh)
 base_docker_image ?= $(container_registry)/base
-base_docker_tag ?= 1.0.0
+base_docker_tag ?= 1.0.1
 live_docker_image ?= $(container_registry)/live
 live_docker_tag ?= $(build_version)
 python_executable ?= python3
