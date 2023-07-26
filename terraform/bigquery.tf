@@ -80,7 +80,8 @@ resource "google_bigquery_table" "l1_users" {
 {"name": "_raw_ts", "type": "TIMESTAMP", "mode": "NULLABLE"},
 {"name": "published_timestamp", "type": "TIMESTAMP", "mode": "NULLABLE"},
 {"name": "_raw_id", "type": "STRING", "mode": "NULLABLE"},
-{"name": "_metadata", "type": "STRING", "mode": "NULLABLE"}
+{"name": "_metadata", "type": "STRING", "mode": "NULLABLE"},
+{"name": "_wrapped_dek", "type": "BYTES", "mode": "NULLABLE"}
 ]
 EOF
 }
