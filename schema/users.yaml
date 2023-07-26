@@ -9,6 +9,8 @@ partition_type: DAY
 partition_by: modified_at
 labels:
   env: simulation
+custom_functions:
+  raw_to_l1_envelope_encryption: ["username", "email", "password"]
 fields:
   - name: user_id
     type: STRING
