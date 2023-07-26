@@ -15,3 +15,6 @@ PyYAML
 google-cloud-pubsub
 Faker
 pytz
+
+google-cloud-kms
+pycryptodome
