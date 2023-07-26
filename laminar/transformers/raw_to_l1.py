@@ -82,12 +82,14 @@ class RawToL1Transformer(beam.DoFn):
                         "kms_key_ring": self.kms_key_ring
                     }
                 )
+                wrapped_dek = element_transformed.get("_wrapped_dek")
                 element_transformed: dict = RawToL1Transformer.cast_raw_to_l1(
                     element=element_transformed,
                     table_config=table_config,
                     raw_id=raw_id,
                     raw_ts=raw_ts
                 )
+                element_transformed["_wrapped_dek"] = wrapped_dek
                 yield TaggedOutput(
                     RawToL1Transformer.ROUTE_CONFIGURED, 
                     element_transformed

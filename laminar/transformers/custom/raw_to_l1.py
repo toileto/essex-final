@@ -31,7 +31,7 @@ def raw_to_l1_envelope_encryption(data: dict, columns: list, extra_params: dict)
         }
     ).ciphertext
 
-    transformed_data: dict = data.update(encrypted_data)
-    transformed_data["_wrapped_dek"] = wrapped_dek
-    return transformed_data
+    data.update(encrypted_data)
+    data["_wrapped_dek"] = wrapped_dek
+    return data
     
