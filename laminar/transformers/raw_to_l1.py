@@ -11,7 +11,7 @@ from typing import Callable, Union
 from base64 import b64encode
 from Crypto.Cipher import ChaCha20_Poly1305
 from Crypto.Random import get_random_bytes
-from google.cloud.kms import KeyManagementServiceClient
+from google.cloud.kms import CryptoKey, CryptoKeyVersion, KeyManagementServiceClient
 
 from laminar.utils.config import ConfigL1
 from laminar.utils.bigquery import BigQueryUtility
@@ -33,8 +33,7 @@ class RawToL1Transformer(beam.DoFn):
         l1_configs: ConfigL1, 
         bigquery_project_id: str,
         kms_project_id: str,
-        kms_region: str,
-        kms_key_ring: str,
+        kms_region: str
     ) -> None:
         """
         Initialize RawToL1Transformer.
@@ -47,7 +46,6 @@ class RawToL1Transformer(beam.DoFn):
         self.bigquery_project_id: str = bigquery_project_id
         self.kms_project_id: str = kms_project_id
         self.kms_region: str = kms_region
-        self.kms_key_ring: str = kms_key_ring
 
     def process(self, element_raw: dict):
         """
@@ -76,18 +74,7 @@ class RawToL1Transformer(beam.DoFn):
                     table_config=table_config, 
                     project_id=self.bigquery_project_id
                 )
-                # element_transformed: dict = RawToL1Transformer.custom_process_raw_to_l1(
-                #     element=element_transformed,
-                #     custom_functions=table_config["custom_functions"],
-                #     extra_params={
-                #         "raw_id": raw_id, 
-                #         "raw_ts": raw_ts,
-                #         "kms_project_id": self.kms_project_id,
-                #         "kms_region": self.kms_region,
-                #         "kms_key_ring": self.kms_key_ring
-                #     }
-                # )
-                # wrapped_dek = element_transformed.get("_wrapped_dek")
+
                 element_transformed: dict = self.cast_raw_to_l1(
                     element=element_transformed,
                     table_config=table_config,
@@ -206,13 +193,43 @@ class RawToL1Transformer(beam.DoFn):
 
         element_casted: dict = RawToL1Transformer.cast_element(element=element, table_schema=table_schema, dek=dek)
 
+        kms_key_ring = table_config["table_details"].get("product")
         kms_key = table_config["table_details"].get("kms_key")
 
-        if kms_key is not None:        
+        if kms_key_ring is not None and kms_key is not None:        
             kms_client = KeyManagementServiceClient()
+
+            try:
+                # Create kms_key_ring if it has not been registered in Cloud KMS
+                kms_client.create_key_ring(
+                    request={
+                        "parent": f"projects/{self.kms_project_id}/locations/{self.kms_region}",
+                        "key_ring_id": kms_key_ring,
+                        "key_ring": {},
+                    }
+                )
+            except Exception as e:
+                # The key ring already exists
+                print(e)
+
+
+            try:
+                # Create kms_key (KEK) if the ID has not been registered in Cloud KMS
+                kms_client.create_crypto_key(request={
+                    'parent': kms_client.key_ring_path(self.kms_project_id, self.kms_region, kms_key_ring), 'crypto_key_id': element_casted[kms_key], 
+                        'crypto_key': {
+                            'purpose': CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT,
+                            'version_template': {'algorithm': CryptoKeyVersion.CryptoKeyVersionAlgorithm.GOOGLE_SYMMETRIC_ENCRYPTION}
+                        }
+                    }
+                )
+            except Exception as e:
+                # The KEK already exists
+                print(e)
+
             wrapped_dek = kms_client.encrypt(
                 request={'name': kms_client.crypto_key_path(
-                        self.kms_project_id, self.kms_region, self.kms_key_ring, element_casted[kms_key]
+                        self.kms_project_id, self.kms_region, kms_key_ring, element_casted[kms_key]
                     ), 'plaintext': dek
                 }
             ).ciphertext
@@ -224,7 +241,7 @@ class RawToL1Transformer(beam.DoFn):
             "published_timestamp": casted_raw_ts,
             "_metadata": element["_metadata"]
         })
-        if kms_key is not None:
+        if kms_key_ring is not None and kms_key is not None:
             element_casted.update({
                 "_wrapped_dek": b64encode(wrapped_dek).decode()
             })            

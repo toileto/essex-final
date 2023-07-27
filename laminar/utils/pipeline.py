@@ -78,7 +78,7 @@ class PipelineUtility:
 
         kms_project_id: str = deployment_config["kms_project_id"]
         kms_region: str = deployment_config["kms_region"]
-        kms_key_ring: str = deployment_config["kms_key_ring"]
+        # kms_key_ring: str = deployment_config["kms_key_ring"]
         
         elements_source = (
             pipeline
@@ -122,8 +122,8 @@ class PipelineUtility:
                     l1_configs=l1_configs, 
                     bigquery_project_id=l1_project_id,
                     kms_project_id=kms_project_id,
-                    kms_region=kms_region,
-                    kms_key_ring=kms_key_ring
+                    kms_region=kms_region
+                    # kms_key_ring=kms_key_ring
                 )
             ).with_outputs(
                 RawToL1Transformer.ROUTE_CONFIGURED,
@@ -191,7 +191,7 @@ class PipelineUtility:
 
         kms_project_id: str = deployment_config["kms_project_id"]
         kms_region: str = deployment_config["kms_region"]
-        kms_key_ring: str = deployment_config["kms_key_ring"]
+        # kms_key_ring: str = deployment_config["kms_key_ring"]
 
         pipeline: beam.Pipeline = beam.Pipeline(options=pipeline_options)
         elements_raw = (
@@ -209,8 +209,8 @@ class PipelineUtility:
                     l1_configs=l1_configs,
                     bigquery_project_id=deployment_config["bigquery_l1_project_id"],
                     kms_project_id=kms_project_id,
-                    kms_region=kms_region,
-                    kms_key_ring=kms_key_ring
+                    kms_region=kms_region
+                    # kms_key_ring=kms_key_ring
                 )
             ).with_outputs(
                 RawToL1Transformer.ROUTE_CONFIGURED,
