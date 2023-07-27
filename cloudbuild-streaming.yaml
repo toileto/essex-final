@@ -1,0 +1,21 @@
+steps:
+  - id: unit_test
+    name: "$_CONTAINER_REGISTRY/base:1.0.1"
+    entrypoint: make
+    args: ["tests", "container_registry=$_CONTAINER_REGISTRY"]
+  - id: build_laminar
+    name: "$_CONTAINER_REGISTRY/base:1.0.1"
+    entrypoint: make
+    args: ["builds", "container_registry=$_CONTAINER_REGISTRY"]
+  - id: deploy_dataflow
+    name: "$_CONTAINER_REGISTRY/base:1.0.1"
+    entrypoint: make
+    args: [
+      "deploy_streaming_dataflow_job", 
+      "project_id=$PROJECT_ID", "deployment=$_DEPLOYMENT", 
+      "container_registry=$_CONTAINER_REGISTRY"
+    ]
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
