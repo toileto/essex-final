@@ -16,10 +16,10 @@ def create_or_update_bigquery_table(table_metadata):
     dataset.location = "asia-southeast2"
 
     try:
-        print(f"Create dataset '{dataset}'")
         client.create_dataset(dataset)
+        print(f"Create dataset '{dataset}'")
     except Conflict:  # The dataset already exists
-        pass
+        print(f"Dataset '{dataset}' already exists")
 
     table_ref = dataset_ref.table(table_name)
 
