@@ -193,7 +193,7 @@ class RawToL1Transformer(beam.DoFn):
 
         element_casted: dict = RawToL1Transformer.cast_element(element=element, table_schema=table_schema, dek=dek)
 
-        kms_key_ring = table_config["table_details"].get("product")
+        kms_key_ring = table_config["table_details"]["labels"].get("product")
         kms_key = table_config["table_details"].get("kms_key")
 
         if kms_key_ring is not None and kms_key is not None:        
