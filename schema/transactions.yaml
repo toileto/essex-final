@@ -1,0 +1,44 @@
+source:
+  format: mongodb
+  database: visibility
+  table: transactions
+destination:
+  dataset: L1_datalake
+  table: transactions
+partition_type: DAY
+partition_by: modified_at
+labels:
+  env: simulation
+  product: finance
+kms_key: user_id
+fields:
+  - name: user_id
+    type: STRING
+    mode: REQUIRED
+    source: userId
+    sensitive: False
+  - name: transaction_id
+    type: STRING 
+    mode: REQUIRED
+    source: transactionId 
+    sensitive: False
+  - name: total_amount
+    type: FLOAT64
+    mode: NULLABLE
+    source: totalAmount
+    sensitive: False
+  - name: email
+    type: STRING
+    mode: NULLABLE
+    source: email
+    sensitive: True
+  - name: created_at
+    type: TIMESTAMP
+    mode: NULLABLE
+    source: createdAt
+    sensitive: False
+  - name: modified_at
+    type: TIMESTAMP
+    mode: NULLABLE
+    source: modifiedAt
+    sensitive: False
