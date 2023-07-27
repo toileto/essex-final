@@ -9,6 +9,7 @@ partition_type: DAY
 partition_by: modified_at
 labels:
   env: simulation
+  product: finance
 kms_key: user_id
 fields:
   - name: user_id
