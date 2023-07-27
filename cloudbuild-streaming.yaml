@@ -3,6 +3,9 @@ steps:
     name: "$_CONTAINER_REGISTRY/base:1.0.2"
     entrypoint: python3
     args: ["create_or_update_bq_table.py"]
+  - id: sync_gcs
+    name: 'gcr.io/cloud-builders/gsutil'
+    args: ['rsync', '-d', '-r', 'schema', 'gs://essex-thesis-project-schema/L1/datalake/']
   - id: unit_test
     name: "$_CONTAINER_REGISTRY/base:1.0.2"
     entrypoint: make
