@@ -1,14 +1,18 @@
 steps:
+  - id: create_bq_table
+    name: "$_CONTAINER_REGISTRY/base:1.0.2"
+    entrypoint: python3
+    args: ["create_or_update_bq_table.py"]
   - id: unit_test
-    name: "$_CONTAINER_REGISTRY/base:1.0.1"
+    name: "$_CONTAINER_REGISTRY/base:1.0.2"
     entrypoint: make
     args: ["tests", "container_registry=$_CONTAINER_REGISTRY"]
   - id: build_laminar
-    name: "$_CONTAINER_REGISTRY/base:1.0.1"
+    name: "$_CONTAINER_REGISTRY/base:1.0.2"
     entrypoint: make
     args: ["builds", "container_registry=$_CONTAINER_REGISTRY"]
   - id: deploy_dataflow
-    name: "$_CONTAINER_REGISTRY/base:1.0.1"
+    name: "$_CONTAINER_REGISTRY/base:1.0.2"
     entrypoint: make
     args: [
       "deploy_streaming_dataflow_job", 
