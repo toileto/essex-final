@@ -139,7 +139,7 @@ def test_RawToL1Transformer_parse_raw_to_l1(dummy_element: dict, dummy_schema_co
 def test_RawToL1Transformer_cast_raw_to_l1(dummy_element_payload: dict, dummy_schema_config: dict):
     table_config: dict = {
         "table_schema": ConfigL1.construct_table_schema(l1_config_fields=dummy_schema_config["fields"]),
-        "table_details": {}
+        "table_details": {"labels": {}}
     }
     dummy_element_payload["_metadata"] =  "dummy_metadata"
     transformed_element: dict = RawToL1Transformer(
