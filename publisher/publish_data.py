@@ -10,18 +10,27 @@ publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(project_id, topic_id)
 
 id = "1"
-table = "users"
+# table = "users"
+table = "transactions"
 db = "visibility"
 now = datetime.now()
 ts = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 ts_ms = int(datetime.timestamp(now)*1000)
+# payload_data = {
+#     "userId": id, 
+#     "username": "jane.doe", 
+#     "email": "jane.doe@gmail.com", 
+#     "password": "jane456", 
+#     "loginCount": 2, 
+#     "isActive": True, 
+#     "createdAt": "2023-07-04T15:00:00.000Z", 
+#     "modifiedAt": "2023-07-04T15:00:00.000Z"
+# }
 payload_data = {
-    "userId": id, 
-    "username": "jane_doe", 
+    "userId": "1", 
+    "transactionId": id, 
+    "totalAmount": 10, 
     "email": "jane.doe@gmail.com", 
-    "password": "jane6789", 
-    "loginCount": 23, 
-    "isActive": True, 
     "createdAt": "2023-07-04T15:00:00.000Z", 
     "modifiedAt": "2023-07-04T15:00:00.000Z"
 }
