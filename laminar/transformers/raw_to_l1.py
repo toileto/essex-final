@@ -188,13 +188,17 @@ class RawToL1Transformer(beam.DoFn):
         """
         table_schema: dict = table_config["table_schema"]
 
-        dek = get_random_bytes(32)
+        kms_key_ring = table_config["table_details"]["labels"].get("product")
+        kms_keys = table_config["table_details"].get("kms_key")
+
+        if kms_keys:
+            dek = {kms_key: get_random_bytes(32) for kms_key in kms_keys}
+        else:
+            dek = None
+        # dek = get_random_bytes(32)
 
         # Encrypt data with DEK
         element_casted: dict = RawToL1Transformer.cast_element(element=element, table_schema=table_schema, dek=dek)
-
-        kms_key_ring = table_config["table_details"]["labels"].get("product")
-        kms_keys = table_config["table_details"].get("kms_key")
 
         wrapped_deks = []
 
@@ -234,7 +238,7 @@ class RawToL1Transformer(beam.DoFn):
                 wrapped_dek = kms_client.encrypt(
                     request={'name': kms_client.crypto_key_path(
                             self.kms_project_id, self.kms_region, kms_key_ring, element_casted[kms_key]
-                        ), 'plaintext': dek
+                        ), 'plaintext': dek[kms_key]
                     }
                 ).ciphertext
 
@@ -254,7 +258,7 @@ class RawToL1Transformer(beam.DoFn):
         return element_casted
 
     @staticmethod
-    def cast_element(element: dict, table_schema: dict, dek: bytes) -> dict:
+    def cast_element(element: dict, table_schema: dict, dek: dict) -> dict:
         """
         Cast data type for each column in an element according to the table schema.
 
@@ -296,7 +300,8 @@ class RawToL1Transformer(beam.DoFn):
                         data_array=data,
                         data_type=data_type,
                         dek=dek,
-                        is_sensitive=column_schema["sensitive"]
+                        is_sensitive=column_schema["sensitive"],
+                        kms_key=column_schema.get("kms_key")
                     )
                 elif data_type == "RECORD" and data_mode == "REPEATED":
                     element_casted[destination_column] = [
@@ -317,7 +322,8 @@ class RawToL1Transformer(beam.DoFn):
                         data=data,
                         data_type=data_type,
                         dek=dek,
-                        is_sensitive=column_schema["sensitive"]
+                        is_sensitive=column_schema["sensitive"],
+                        kms_key=column_schema.get("kms_key")
                     )
         return element_casted
 
@@ -372,8 +378,9 @@ class RawToL1Transformer(beam.DoFn):
     def cast_scalar(
         data: Union[int, float, bool, str], 
         data_type: str,
-        dek: bytes,
-        is_sensitive: bool
+        dek: dict,
+        is_sensitive: bool,
+        kms_key: str = None
     ) -> Union[int, float, datetime, bool, str]:
         """
         Cast a scalar data in an element according to the table schema.
@@ -386,7 +393,7 @@ class RawToL1Transformer(beam.DoFn):
             Casted data.
         """
         if is_sensitive:
-            cipher = ChaCha20_Poly1305.new(key=dek)
+            cipher = ChaCha20_Poly1305.new(key=dek[kms_key])
             nonce = cipher.nonce
             ciphertext, tag = cipher.encrypt_and_digest(str(data).encode())
             data_casted = b64encode(tag+nonce+ciphertext).decode()
@@ -406,7 +413,7 @@ class RawToL1Transformer(beam.DoFn):
         return data_casted
     
     @staticmethod
-    def cast_array(data_array: list, data_type: str, dek: bytes, is_sensitive: bool) -> list:
+    def cast_array(data_array: list, data_type: str, dek: dict, is_sensitive: bool, kms_key: str = None) -> list:
         """
         Cast an array data in an element according to the table schema.
 
@@ -418,7 +425,9 @@ class RawToL1Transformer(beam.DoFn):
             Casted non-empty data list.
         """
         return [
-            RawToL1Transformer.cast_scalar(data=data, data_type=data_type, dek=dek, is_sensitive=is_sensitive) 
+            RawToL1Transformer.cast_scalar(
+                data=data, data_type=data_type, dek=dek, is_sensitive=is_sensitive, kms_key=kms_key
+            ) 
             for data in data_array if data is not None
         ]
 
