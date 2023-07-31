@@ -189,7 +189,7 @@ class RawToL1Transformer(beam.DoFn):
         table_schema: dict = table_config["table_schema"]
 
         kms_key_ring = table_config["table_details"]["labels"].get("product")
-        kms_keys = table_config["table_details"].get("kms_key")
+        kms_keys = table_config["table_details"].get("kms_keys")
 
         if kms_keys:
             dek = {kms_key: get_random_bytes(32) for kms_key in kms_keys}
