@@ -81,7 +81,6 @@ class RawToL1Transformer(beam.DoFn):
                     raw_id=raw_id,
                     raw_ts=raw_ts
                 )
-                # element_transformed["_wrapped_dek"] = wrapped_dek
                 yield TaggedOutput(
                     RawToL1Transformer.ROUTE_CONFIGURED, 
                     element_transformed
@@ -191,16 +190,20 @@ class RawToL1Transformer(beam.DoFn):
 
         dek = get_random_bytes(32)
 
+        # Encrypt data with DEK
         element_casted: dict = RawToL1Transformer.cast_element(element=element, table_schema=table_schema, dek=dek)
 
         kms_key_ring = table_config["table_details"]["labels"].get("product")
-        kms_key = table_config["table_details"].get("kms_key")
+        kms_keys = table_config["table_details"].get("kms_key")
 
-        if kms_key_ring is not None and kms_key is not None:        
+        wrapped_deks = []
+
+        if kms_key_ring is not None and kms_keys is not None:
+
             kms_client = KeyManagementServiceClient()
-
+            
+            # Create key ring
             try:
-                # Create kms_key_ring if it has not been registered in Cloud KMS
                 kms_client.create_key_ring(
                     request={
                         "parent": f"projects/{self.kms_project_id}/locations/{self.kms_region}",
@@ -212,27 +215,30 @@ class RawToL1Transformer(beam.DoFn):
                 # The key ring already exists
                 print(e)
 
-
-            try:
-                # Create kms_key (KEK) if the ID has not been registered in Cloud KMS
-                kms_client.create_crypto_key(request={
-                    'parent': kms_client.key_ring_path(self.kms_project_id, self.kms_region, kms_key_ring), 'crypto_key_id': element_casted[kms_key], 
-                        'crypto_key': {
-                            'purpose': CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT,
-                            'version_template': {'algorithm': CryptoKeyVersion.CryptoKeyVersionAlgorithm.GOOGLE_SYMMETRIC_ENCRYPTION}
+            for kms_key in kms_keys:
+                # Create KEK
+                try:
+                    kms_client.create_crypto_key(request={
+                        'parent': kms_client.key_ring_path(self.kms_project_id, self.kms_region, kms_key_ring), 'crypto_key_id': element_casted[kms_key], 
+                            'crypto_key': {
+                                'purpose': CryptoKey.CryptoKeyPurpose.ENCRYPT_DECRYPT,
+                                'version_template': {'algorithm': CryptoKeyVersion.CryptoKeyVersionAlgorithm.GOOGLE_SYMMETRIC_ENCRYPTION}
+                            }
                         }
-                    }
-                )
-            except Exception as e:
-                # The KEK already exists
-                print(e)
+                    )
+                except Exception as e:
+                    # The KEK already exists
+                    print(e)
 
-            wrapped_dek = kms_client.encrypt(
-                request={'name': kms_client.crypto_key_path(
-                        self.kms_project_id, self.kms_region, kms_key_ring, element_casted[kms_key]
-                    ), 'plaintext': dek
-                }
-            ).ciphertext
+                # Encrypt DEK with KEK
+                wrapped_dek = kms_client.encrypt(
+                    request={'name': kms_client.crypto_key_path(
+                            self.kms_project_id, self.kms_region, kms_key_ring, element_casted[kms_key]
+                        ), 'plaintext': dek
+                    }
+                ).ciphertext
+
+                wrapped_deks.append(wrapped_dek)
 
         casted_raw_ts: datetime = TimeUtility.safe_cast_ts_to_datetime(data=raw_ts)
         element_casted.update({
@@ -243,7 +249,7 @@ class RawToL1Transformer(beam.DoFn):
         })
         if kms_key_ring is not None and kms_key is not None:
             element_casted.update({
-                "_wrapped_dek": b64encode(wrapped_dek).decode()
+                "_wrapped_dek": [b64encode(wrapped_dek).decode() for wrapped_dek in wrapped_deks]
             })            
         return element_casted
 
