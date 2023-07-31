@@ -36,15 +36,15 @@ def create_or_update_bigquery_table(table_metadata):
             bigquery.SchemaField("published_timestamp", "TIMESTAMP"),
             bigquery.SchemaField("_raw_id", "STRING"),
             bigquery.SchemaField("_metadata", "STRING"),
-            bigquery.SchemaField("_wrapped_dek", "BYTES")
+            bigquery.SchemaField("_wrapped_dek", "BYTES", "REPEATED")
         ]
         schema = schema + metadata
         table = bigquery.Table(table_ref, schema=schema)
         table = client.create_table(table)
-        print(f"Table {table_ref} exists...")
+        print(f"Table {table_ref} created...")
     else:
         # If the table already exists, update the schema with any new columns
-        print(f"Table {table_ref} exists...")
+        print(f"Table {table_ref} already exists. Updating...")
         table = client.get_table(table_ref)
         existing_columns = set(field.name for field in table.schema)
         new_columns = [
