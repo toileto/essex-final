@@ -10,28 +10,59 @@ partition_by: modified_at
 labels:
   env: simulation
   product: finance
-kms_key: user_id
+kms_keys: 
+  - seller_id
+  - buyer_id
 fields:
-  - name: user_id
-    type: STRING
-    mode: REQUIRED
-    source: userId
-    sensitive: False
   - name: transaction_id
     type: STRING 
     mode: REQUIRED
     source: transactionId 
+    sensitive: False
+  - name: seller_id
+    type: STRING
+    mode: REQUIRED
+    source: sellerId
+    sensitive: False
+  - name: seller_name
+    type: STRING
+    mode: NULLABLE
+    source: sellerName
+    sensitive: True
+    kms_key: seller_id
+  - name: seller_email
+    type: STRING
+    mode: NULLABLE
+    source: sellerEmail
+    sensitive: True
+    kms_key: seller_id
+  - name: buyer_id
+    type: STRING
+    mode: REQUIRED
+    source: buyerId
+    sensitive: False
+  - name: buyer_name
+    type: STRING
+    mode: NULLABLE
+    source: buyerName
+    sensitive: True
+    kms_key: buyer_id
+  - name: buyer_email
+    type: STRING
+    mode: NULLABLE
+    source: buyerEmail
+    sensitive: True
+    kms_key: buyer_id
+  - name: product_id
+    type: STRING
+    mode: NULLABLE
+    source: productId
     sensitive: False
   - name: total_amount
     type: FLOAT64
     mode: NULLABLE
     source: totalAmount
     sensitive: False
-  - name: email
-    type: STRING
-    mode: NULLABLE
-    source: email
-    sensitive: True
   - name: created_at
     type: TIMESTAMP
     mode: NULLABLE
