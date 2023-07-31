@@ -10,36 +10,30 @@ publisher = pubsub_v1.PublisherClient()
 topic_path = publisher.topic_path(project_id, topic_id)
 
 id = "1"
-# table = "users"
 table = "transactions"
 db = "visibility"
 now = datetime.now()
 ts = now.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 ts_ms = int(datetime.timestamp(now)*1000)
-# payload_data = {
-#     "userId": id, 
-#     "username": "jane.doe", 
-#     "email": "jane.doe@gmail.com", 
-#     "password": "jane456", 
-#     "loginCount": 2, 
-#     "isActive": True, 
-#     "createdAt": "2023-07-04T15:00:00.000Z", 
-#     "modifiedAt": "2023-07-04T15:00:00.000Z"
-# }
 payload_data = {
-    "userId": "1", 
-    "transactionId": id, 
-    "totalAmount": 10, 
-    "email": "jane.doe@gmail.com", 
-    "createdAt": "2023-07-04T15:00:00.000Z", 
-    "modifiedAt": "2023-07-04T15:00:00.000Z"
+    "transactionId": id,
+    "sellerId": "cee9170b-3040-40fe-a774-3c283764e63d",
+    "sellerName": "John Doe",
+    "sellerEmail": "john.doe@gmail.com",
+    "buyerId": "1",
+    "buyerName": "Jane Doe",
+    "buyerEmail": "jane.doe@gmail.com",
+    "productId": "1", 
+    "totalAmount": 10.0, 
+    "createdAt": "2023-07-04T16:00:00.000Z", 
+    "modifiedAt": "2023-07-04T16:00:00.000Z"
 }
 
 data = {
     "id": id,
     "table": table,
     "db": db,
-    "op": "ud",
+    "op": "c",
     "data": json.dumps(payload_data),
     "ts": ts,
     "ts_ms": ts_ms,
