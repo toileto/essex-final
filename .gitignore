@@ -15,3 +15,5 @@ venv/
 .terraform*
 terraform.tfstate*
 
+.idea
+
