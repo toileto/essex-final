@@ -245,7 +245,7 @@ class RawToL1Transformer(beam.DoFn):
                 wrapped_deks.append(wrapped_dek)
 
         casted_raw_ts: datetime = TimeUtility.safe_cast_ts_to_datetime(
-            data=datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            data=datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%fZ")
         )
         element_casted.update({
             "_raw_ts": casted_raw_ts,
