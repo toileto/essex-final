@@ -269,5 +269,110 @@ fields:
     sensitive: True
     kms_key: user_id
 
+  - name: rule_36
+    type: STRING
+    mode: NULLABLE
+    source: rule_36
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_37
+    type: STRING
+    mode: NULLABLE
+    source: rule_37
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_38
+    type: STRING
+    mode: NULLABLE
+    source: rule_38
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_39
+    type: STRING
+    mode: NULLABLE
+    source: rule_39
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_40
+    type: STRING
+    mode: NULLABLE
+    source: rule_40
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_41
+    type: STRING
+    mode: NULLABLE
+    source: rule_41
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_42
+    type: STRING
+    mode: NULLABLE
+    source: rule_42
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_43
+    type: STRING
+    mode: NULLABLE
+    source: rule_43
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_44
+    type: STRING
+    mode: NULLABLE
+    source: rule_44
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_45
+    type: STRING
+    mode: NULLABLE
+    source: rule_45
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_46
+    type: STRING
+    mode: NULLABLE
+    source: rule_46
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_47
+    type: STRING
+    mode: NULLABLE
+    source: rule_47
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_48
+    type: STRING
+    mode: NULLABLE
+    source: rule_48
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_49
+    type: STRING
+    mode: NULLABLE
+    source: rule_49
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_50
+    type: STRING
+    mode: NULLABLE
+    source: rule_50
+    sensitive: True
+    kms_key: user_id
+
 
 
