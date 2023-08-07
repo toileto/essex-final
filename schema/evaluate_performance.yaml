@@ -23,6 +23,11 @@ fields:
     mode: NULLABLE
     source: number_of_rules
     sensitive: False
+  - name: modified_at
+    type: TIMESTAMP
+    mode: NULLABLE
+    source: modifiedAt
+    sensitive: False
   - name: rule_1
     type: STRING
     mode: NULLABLE
