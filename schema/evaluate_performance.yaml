@@ -40,3 +40,21 @@ fields:
     source: rule_2
     sensitive: True
     kms_key: user_id
+  - name: rule_3
+    type: STRING
+    mode: NULLABLE
+    source: rule_3
+    sensitive: True
+    kms_key: user_id
+  - name: rule_4
+    type: STRING
+    mode: NULLABLE
+    source: rule_4
+    sensitive: True
+    kms_key: user_id
+  - name: rule_5
+    type: STRING
+    mode: NULLABLE
+    source: rule_5
+    sensitive: True
+    kms_key: user_id
