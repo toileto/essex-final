@@ -33,4 +33,4 @@ fields:
     mode: NULLABLE
     source: rule_1
     sensitive: True
-    kms_key: user_id
+    kms_key: rule_1
