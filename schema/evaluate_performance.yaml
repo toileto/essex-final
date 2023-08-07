@@ -1,0 +1,31 @@
+source:
+  format: postgresql
+  database: visibility
+  table: evaluate_performance
+destination:
+  dataset: L1_datalake
+  table: evaluate_performance
+partition_type: DAY
+partition_by: modified_at
+labels:
+  env: simulation
+  product: evaluation
+kms_keys: 
+  - user_id
+fields:
+  - name: user_id
+    type: STRING
+    mode: REQUIRED
+    source: user_id
+    sensitive: False
+  - name: number_of_rules
+    type: INTEGER
+    mode: NULLABLE
+    source: number_of_rules
+    sensitive: False
+  - name: rule_1
+    type: STRING
+    mode: NULLABLE
+    source: rule_1
+    sensitive: True
+    kms_key: user_id
