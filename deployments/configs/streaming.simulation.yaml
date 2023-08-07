@@ -6,7 +6,7 @@ beam_streaming: True
 dataflow_job_name: laminar-streaming-simulation
 dataflow_project_id: essex-thesis-project
 dataflow_region: asia-southeast2
-dataflow_zone: asia-southeast2-b
+#dataflow_zone: asia-southeast2-b
 dataflow_temp_location: gs://essex-thesis-project-laminar-general/streaming/temp/
 dataflow_staging_location: gs://essex-thesis-project-laminar-general/streaming/staging/
 dataflow_subnetwork: https://www.googleapis.com/compute/v1/projects/essex-thesis-project/regions/asia-southeast2/subnetworks/data-processing-subnet-general-1-simulation
