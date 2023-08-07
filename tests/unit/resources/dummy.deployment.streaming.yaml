@@ -3,6 +3,7 @@ beam_streaming: True
 dataflow_job_name: "laminar-dummy"
 dataflow_project_id: "dummy-project"
 dataflow_region: "asia-southeast2"
+dataflow_zone: "asia-southeast2-a"
 dataflow_temp_location: "gs://laminar-dummy/temp/"
 dataflow_staging_location: "gs://laminar-dummy/staging/"
 dataflow_subnetwork: "https://www.googleapis.com/compute/v1/projects/dummy-project/regions/asia-southeast2/subnetworks/dummy-subnet"

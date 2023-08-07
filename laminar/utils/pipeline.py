@@ -30,7 +30,7 @@ class PipelineUtility:
             "streaming": deployment_config["beam_streaming"],
             "project": deployment_config["dataflow_project_id"],
             "region": deployment_config["dataflow_region"],
-            # "worker_zone": deployment_config["dataflow_zone"],
+            "worker_zone": deployment_config["dataflow_zone"],
             "job_name": deployment_config["dataflow_job_name"],
             "temp_location": deployment_config["dataflow_temp_location"],
             "staging_location": deployment_config["dataflow_staging_location"],
