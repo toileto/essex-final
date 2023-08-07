@@ -26,11 +26,11 @@ fields:
   - name: modified_at
     type: TIMESTAMP
     mode: NULLABLE
-    source: modifiedAt
+    source: modified_at
     sensitive: False
   - name: rule_1
     type: STRING
     mode: NULLABLE
     source: rule_1
     sensitive: True
-    kms_key: rule_1
+    kms_key: user_id
