@@ -164,3 +164,39 @@ fields:
     sensitive: True
     kms_key: user_id
 
+  - name: rule_21
+    type: STRING
+    mode: NULLABLE
+    source: rule_21
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_22
+    type: STRING
+    mode: NULLABLE
+    source: rule_22
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_23
+    type: STRING
+    mode: NULLABLE
+    source: rule_23
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_24
+    type: STRING
+    mode: NULLABLE
+    source: rule_24
+    sensitive: True
+    kms_key: user_id
+
+  - name: rule_25
+    type: STRING
+    mode: NULLABLE
+    source: rule_25
+    sensitive: True
+    kms_key: user_id
+
+
